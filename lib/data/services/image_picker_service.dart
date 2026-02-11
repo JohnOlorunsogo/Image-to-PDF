@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -16,8 +17,8 @@ class ImagePickerService {
       }
       return [];
     } catch (e) {
-      // Handle error or throw
-      rethrow;
+      debugPrint('Error picking images: $e');
+      return [];
     }
   }
 
@@ -26,7 +27,8 @@ class ImagePickerService {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
       return image?.path;
     } catch (e) {
-      rethrow;
+      debugPrint('Error capturing image: $e');
+      return null;
     }
   }
 }

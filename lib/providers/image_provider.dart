@@ -23,13 +23,13 @@ class ImageListNotifier extends Notifier<List<ImageModel>> {
   }
 
   void reorderImages(int oldIndex, int newIndex) {
+    final items = [...state];
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
-    final item = state.removeAt(oldIndex);
-    state.insert(newIndex, item);
-    // Trigger state update
-    state = [...state];
+    final item = items.removeAt(oldIndex);
+    items.insert(newIndex, item);
+    state = items;
   }
 
   void updateImage(String id, String newPath) {

@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to select images for PDF conversion.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to capture photos for PDF conversion.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access for camera functionality.</string>
 </dict>
 </plist>
