@@ -1,11 +1,13 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
+
+import 'package:images_to_pdf/core/theme/app_colors.dart';
 import 'package:images_to_pdf/data/models/image_model.dart';
 import 'package:images_to_pdf/data/models/pdf_settings_model.dart';
 import 'package:images_to_pdf/providers/pdf_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 
 class PdfPreviewScreen extends ConsumerStatefulWidget {
   final List<ImageModel> images;
@@ -21,170 +23,276 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PDF Preview'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) =>
+                  AppColors.primaryGradient.createShader(bounds),
+              child: const Icon(
+                Icons.picture_as_pdf_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Preview',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: _showSettingsDialog,
+          // Settings
+          Container(
+            margin: const EdgeInsets.only(right: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.tune_rounded, size: 20),
+              onPressed: () => _showSettingsSheet(context, isDark),
+              tooltip: 'PDF Settings',
+              color: AppColors.primary,
+            ),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: PdfPreview(
         build: (format) => _generatePdf(format),
         canDebug: false,
-        actions: [
-          // Custom actions can be added here
-        ],
+        canChangeOrientation: false,
+        pdfPreviewPageDecoration: BoxDecoration(
+          color: isDark ? AppColors.scaffoldDark : AppColors.surfaceLight,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Future<Uint8List> _generatePdf(PdfPageFormat format) async {
-    // Update settings with the format provided by PdfPreview layout logic if needed,
-    // or just use our local settings but override format.
-    // However, PdfPreview asks us to build for a specific format.
-    // If the user changes format in PdfPreview's own UI (if enabled), this 'format' arg changes.
-    // But we also have our own settings.
-    // Let's rely on PdfPreview's format for page size if we want to support its UI,
-    // or we force our own.
-    // For now, let's sync them.
-
     final currentSettings = _settings.copyWith(pageFormat: format);
-
     final pdfService = ref.read(pdfServiceProvider);
-
-    // PdfService.generatePdf returns a File. Printing needs bytes.
-    // I should probably refactor PdfService to return bytes or have a method for bytes.
-    // Or just read the file.
-
-    // Using a temporary workaround: modify PdfService to return bytes is better for 'printing' package.
-    // Let's just read the bytes from the file for now to avoid breaking existing service signature quickly,
-    // but cleaner is to have generatePdfBytes.
-
     final file = await pdfService.generatePdf(widget.images, currentSettings);
     return file.readAsBytes();
   }
 
-  void _showSettingsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        // Local state for the dialog
-        bool passwordEnabled = _settings.passwordProtected;
-        String? password = _settings.password;
-        bool ocrEnabled = _settings.enableOcr;
-        double margin = _settings.margin;
-        final passwordController = TextEditingController(text: password);
+  // ──────────────────────── SETTINGS BOTTOM SHEET ────────────────────────
+  void _showSettingsSheet(BuildContext context, bool isDark) {
+    bool ocrEnabled = _settings.enableOcr;
+    bool passwordEnabled = _settings.passwordProtected;
+    String? password = _settings.password;
+    double margin = _settings.margin;
+    String? watermarkText = _settings.watermarkText;
+    final passwordController = TextEditingController(text: password);
+    final watermarkController = TextEditingController(text: watermarkText);
 
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
         return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('PDF Settings'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SwitchListTile(
-                      title: const Text('Enable OCR (Searchable PDF)'),
-                      subtitle: const Text('Recognize text in images'),
-                      value: ocrEnabled,
-                      onChanged: (val) {
-                        setState(() {
-                          ocrEnabled = val;
-                        });
-                      },
-                    ),
-                    const Divider(),
-                    SwitchListTile(
-                      title: const Text('Password Protection'),
-                      value: passwordEnabled,
-                      onChanged: (val) {
-                        setState(() {
-                          passwordEnabled = val;
-                        });
-                      },
-                    ),
-                    if (passwordEnabled)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: TextField(
-                          controller: passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            border: OutlineInputBorder(),
+          builder: (ctx, setSheetState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.65,
+              minChildSize: 0.4,
+              maxChildSize: 0.85,
+              expand: false,
+              builder: (_, scrollController) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      // Header
+                      Center(
+                        child: Text(
+                          'PDF Settings',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ─── OCR Toggle ───
+                      _SettingTile(
+                        icon: Icons.text_fields_rounded,
+                        title: 'OCR — Searchable PDF',
+                        subtitle: 'Recognize and embed text from images',
+                        trailing: Switch.adaptive(
+                          value: ocrEnabled,
+                          onChanged: (v) => setSheetState(() => ocrEnabled = v),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // ─── Password ───
+                      _SettingTile(
+                        icon: Icons.lock_outline_rounded,
+                        title: 'Password Protection',
+                        subtitle: 'Encrypt PDF with a password',
+                        trailing: Switch.adaptive(
+                          value: passwordEnabled,
+                          onChanged: (v) =>
+                              setSheetState(() => passwordEnabled = v),
+                        ),
+                      ),
+                      if (passwordEnabled) ...[
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 44),
+                          child: TextField(
+                            controller: passwordController,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Enter password',
+                              prefixIcon: Icon(Icons.key_rounded, size: 18),
+                            ),
+                            onChanged: (v) => password = v,
                           ),
-                          obscureText: true,
-                          onChanged: (val) {
-                            password = val;
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+
+                      // ─── Margin ───
+                      _SettingTile(
+                        icon: Icons.margin_rounded,
+                        title: 'Page Margin',
+                        subtitle: '${margin.round()} pt',
+                        trailing: SizedBox(
+                          width: 140,
+                          child: Slider(
+                            value: margin,
+                            min: 0,
+                            max: 50,
+                            divisions: 10,
+                            label: '${margin.round()}',
+                            onChanged: (v) => setSheetState(() => margin = v),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // ─── Watermark ───
+                      _SettingTile(
+                        icon: Icons.branding_watermark_outlined,
+                        title: 'Watermark',
+                        subtitle: 'Overlay text on every page',
+                        trailing: const SizedBox.shrink(),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 44),
+                        child: TextField(
+                          controller: watermarkController,
+                          decoration: const InputDecoration(
+                            hintText: 'e.g. Confidential',
+                            prefixIcon: Icon(
+                              Icons.text_format_rounded,
+                              size: 18,
+                            ),
+                          ),
+                          onChanged: (v) => watermarkText = v,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // ─── Apply ───
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              _settings = _settings.copyWith(
+                                enableOcr: ocrEnabled,
+                                passwordProtected: passwordEnabled,
+                                password: passwordController.text,
+                                margin: margin,
+                                watermarkText: watermarkController.text,
+                              );
+                            });
+                            Navigator.pop(ctx);
                           },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2),
+                            child: Text('Apply Settings'),
+                          ),
                         ),
                       ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text('Page Margin'),
-                      subtitle: Slider(
-                        value: margin,
-                        min: 0,
-                        max: 50,
-                        divisions: 10,
-                        label: margin.round().toString(),
-                        onChanged: (val) {
-                          setState(() {
-                            margin = val;
-                          });
-                        },
-                      ),
-                      trailing: Text('${margin.round()}'),
-                    ),
-                    const Divider(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          labelText: 'Watermark Text',
-                          hintText: 'e.g. Confidential',
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (val) {
-                          // Direct update to local variable if using controller, or state
-                          // Here we should probably use a controller or just update a variable.
-                          // But my _showSettingsDialog logic uses variables initialized at start.
-                          // I'll need to add a variable 'watermarkText' to the dialog context.
-                        },
-                        // Actually, I need to fetch current value and update it.
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    // Update main state
-                    this.setState(() {
-                      _settings = _settings.copyWith(
-                        passwordProtected: passwordEnabled,
-                        password: passwordController
-                            .text, // Use controller text to be safe
-                        enableOcr: ocrEnabled,
-                        margin: margin,
-                      );
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Apply'),
-                ),
-              ],
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );
       },
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SETTING TILE
+// ═══════════════════════════════════════════════════════════
+
+class _SettingTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget trailing;
+
+  const _SettingTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: Theme.of(context).colorScheme.surface,
+      ),
+      child: Row(
+        children: [
+          ShaderMask(
+            shaderCallback: (bounds) =>
+                AppColors.primaryGradient.createShader(bounds),
+            child: Icon(icon, color: Colors.white, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.titleSmall),
+                const SizedBox(height: 2),
+                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+          trailing,
+        ],
+      ),
     );
   }
 }
