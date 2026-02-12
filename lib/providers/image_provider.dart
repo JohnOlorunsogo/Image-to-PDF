@@ -24,9 +24,6 @@ class ImageListNotifier extends Notifier<List<ImageModel>> {
 
   void reorderImages(int oldIndex, int newIndex) {
     final items = [...state];
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     final item = items.removeAt(oldIndex);
     items.insert(newIndex, item);
     state = items;
