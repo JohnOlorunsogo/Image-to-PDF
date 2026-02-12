@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -101,6 +103,8 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
     final passwordController = TextEditingController(text: password);
     final watermarkController = TextEditingController(text: watermarkText);
 
+    final bool isAndroid = Platform.isAndroid;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -128,17 +132,20 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // ─── OCR Toggle ───
-                      _SettingTile(
-                        icon: Icons.text_fields_rounded,
-                        title: 'OCR — Searchable PDF',
-                        subtitle: 'Recognize and embed text from images',
-                        trailing: Switch.adaptive(
-                          value: ocrEnabled,
-                          onChanged: (v) => setSheetState(() => ocrEnabled = v),
+                      // ─── OCR Toggle (Android only) ───
+                      if (isAndroid) ...[
+                        _SettingTile(
+                          icon: Icons.text_fields_rounded,
+                          title: 'OCR — Searchable PDF',
+                          subtitle: 'Recognize and embed text from images',
+                          trailing: Switch.adaptive(
+                            value: ocrEnabled,
+                            onChanged: (v) =>
+                                setSheetState(() => ocrEnabled = v),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 8),
+                      ],
 
                       // ─── Password ───
                       _SettingTile(
@@ -219,7 +226,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
                             HapticFeedback.lightImpact();
                             setState(() {
                               _settings = _settings.copyWith(
-                                enableOcr: ocrEnabled,
+                                enableOcr: isAndroid ? ocrEnabled : false,
                                 passwordProtected: passwordEnabled,
                                 password: passwordController.text,
                                 margin: margin,
