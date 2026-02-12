@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 
@@ -36,7 +37,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
               shaderCallback: (bounds) =>
                   AppColors.primaryGradient.createShader(bounds),
               child: const Icon(
-                Icons.picture_as_pdf_rounded,
+                IconsaxPlusBold.document_text,
                 color: Colors.white,
                 size: 22,
               ),
@@ -59,7 +60,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: IconButton(
-              icon: const Icon(Icons.tune_rounded, size: 20),
+              icon: const Icon(IconsaxPlusLinear.setting_4, size: 20),
               onPressed: () => _showSettingsSheet(context, isDark),
               tooltip: 'PDF Settings',
               color: AppColors.primary,
@@ -135,7 +136,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
                       // ─── OCR Toggle (Android only) ───
                       if (isAndroid) ...[
                         _SettingTile(
-                          icon: Icons.text_fields_rounded,
+                          icon: IconsaxPlusLinear.text_block,
                           title: 'OCR — Searchable PDF',
                           subtitle: 'Recognize and embed text from images',
                           trailing: Switch.adaptive(
@@ -149,7 +150,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
 
                       // ─── Password ───
                       _SettingTile(
-                        icon: Icons.lock_outline_rounded,
+                        icon: IconsaxPlusLinear.lock,
                         title: 'Password Protection',
                         subtitle: 'Encrypt PDF with a password',
                         trailing: Switch.adaptive(
@@ -167,7 +168,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
                             obscureText: true,
                             decoration: const InputDecoration(
                               labelText: 'Enter password',
-                              prefixIcon: Icon(Icons.key_rounded, size: 18),
+                              prefixIcon: Icon(IconsaxPlusLinear.key, size: 18),
                             ),
                             onChanged: (v) => password = v,
                           ),
@@ -177,7 +178,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
 
                       // ─── Margin ───
                       _SettingTile(
-                        icon: Icons.margin_rounded,
+                        icon: IconsaxPlusLinear.slider_horizontal,
                         title: 'Page Margin',
                         subtitle: '${margin.round()} pt',
                         trailing: SizedBox(
@@ -196,7 +197,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
 
                       // ─── Watermark ───
                       _SettingTile(
-                        icon: Icons.branding_watermark_outlined,
+                        icon: IconsaxPlusLinear.text_bold,
                         title: 'Watermark',
                         subtitle: 'Overlay text on every page',
                         trailing: const SizedBox.shrink(),
@@ -209,7 +210,7 @@ class _PdfPreviewScreenState extends ConsumerState<PdfPreviewScreen> {
                           decoration: const InputDecoration(
                             hintText: 'e.g. Confidential',
                             prefixIcon: Icon(
-                              Icons.text_format_rounded,
+                              IconsaxPlusLinear.text_block,
                               size: 18,
                             ),
                           ),

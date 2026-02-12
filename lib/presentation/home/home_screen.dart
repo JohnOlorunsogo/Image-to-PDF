@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 import 'package:images_to_pdf/core/theme/app_colors.dart';
@@ -83,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             shaderCallback: (bounds) =>
                 AppColors.primaryGradient.createShader(bounds),
             child: const Icon(
-              Icons.picture_as_pdf_rounded,
+              IconsaxPlusBold.document_text,
               color: Colors.white,
               size: 26,
             ),
@@ -105,7 +106,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
         if (imageCount > 0)
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded),
+            icon: const Icon(IconsaxPlusLinear.trash),
             onPressed: () => _showClearDialog(context),
             tooltip: 'Clear All',
           ),
@@ -161,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       shaderCallback: (bounds) =>
                           AppColors.primaryGradient.createShader(bounds),
                       child: const Icon(
-                        Icons.add_photo_alternate_outlined,
+                        IconsaxPlusLinear.gallery_add,
                         size: 48,
                         color: Colors.white,
                       ),
@@ -185,13 +186,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 // Primary action button
                 _GradientButton(
                   onPressed: () => _pickImages(),
-                  icon: Icons.photo_library_rounded,
+                  icon: IconsaxPlusLinear.gallery,
                   label: 'Select Images',
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
                   onPressed: () => _captureFromCamera(),
-                  icon: const Icon(Icons.camera_alt_rounded, size: 20),
+                  icon: const Icon(IconsaxPlusLinear.camera, size: 20),
                   label: const Text('Take Photo'),
                 ),
               ],
@@ -305,7 +306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.image_rounded,
+                        IconsaxPlusBold.image,
                         size: 16,
                         color: AppColors.primary,
                       ),
@@ -340,7 +341,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.add_rounded,
+                          IconsaxPlusLinear.add,
                           size: 16,
                           color: Theme.of(context).textTheme.bodyMedium?.color,
                         ),
@@ -364,7 +365,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     );
                   },
-                  icon: Icons.picture_as_pdf_rounded,
+                  icon: IconsaxPlusBold.document_text,
                   label: 'Convert',
                   compact: true,
                 ),
@@ -392,7 +393,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     _MiniFabOption(
-                      icon: Icons.photo_library_rounded,
+                      icon: IconsaxPlusLinear.gallery,
                       label: 'Gallery',
                       onTap: () {
                         setState(() => _fabExpanded = false);
@@ -402,7 +403,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     ),
                     const SizedBox(height: 8),
                     _MiniFabOption(
-                      icon: Icons.camera_alt_rounded,
+                      icon: IconsaxPlusLinear.camera,
                       label: 'Camera',
                       onTap: () {
                         setState(() => _fabExpanded = false);
@@ -423,7 +424,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           child: AnimatedRotation(
             turns: _fabExpanded ? 0.125 : 0,
             duration: const Duration(milliseconds: 200),
-            child: const Icon(Icons.add_rounded, size: 28),
+            child: const Icon(IconsaxPlusLinear.add, size: 28),
           ),
         ),
       ],
@@ -546,7 +547,10 @@ class _ImageTile extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     color: isDark ? AppColors.cardDark : AppColors.surfaceLight,
-                    child: const Icon(Icons.broken_image_rounded, size: 32),
+                    child: const Icon(
+                      IconsaxPlusLinear.gallery_slash,
+                      size: 32,
+                    ),
                   ),
                 ),
               ),
@@ -605,7 +609,7 @@ class _ImageTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
-                      Icons.close_rounded,
+                      IconsaxPlusLinear.close_circle,
                       size: 14,
                       color: Colors.white,
                     ),

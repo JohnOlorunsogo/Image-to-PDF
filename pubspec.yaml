@@ -49,6 +49,7 @@ dependencies:
   image_editor_plus: ^1.0.8
   reorderable_grid_view: ^2.2.8
   google_fonts: ^8.0.1
+  iconsax_plus: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:image_cropper/image_cropper.dart' as ic;
 import 'package:image_editor_plus/image_editor_plus.dart';
 
@@ -67,7 +68,7 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.image_not_supported_outlined,
+                IconsaxPlusLinear.gallery_slash,
                 size: 64,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -79,7 +80,7 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen>
               const SizedBox(height: 24),
               TextButton.icon(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_rounded),
+                icon: const Icon(IconsaxPlusLinear.arrow_left),
                 label: const Text('Go Back'),
               ),
             ],
@@ -110,7 +111,7 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen>
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => const Center(
                       child: Icon(
-                        Icons.broken_image_rounded,
+                        IconsaxPlusLinear.gallery_slash,
                         size: 64,
                         color: Colors.white54,
                       ),
@@ -153,7 +154,7 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen>
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.arrow_back_rounded,
+                              IconsaxPlusLinear.arrow_left,
                               color: Colors.white,
                               size: 20,
                             ),
@@ -217,17 +218,17 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen>
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _ActionButton(
-            icon: Icons.crop_rounded,
+            icon: IconsaxPlusLinear.crop,
             label: 'Crop',
             onTap: () => _cropImage(context, image),
           ),
           _ActionButton(
-            icon: Icons.tune_rounded,
+            icon: IconsaxPlusLinear.setting_4,
             label: 'Edit',
             onTap: () => _editImage(context, image),
           ),
           _ActionButton(
-            icon: Icons.rotate_right_rounded,
+            icon: IconsaxPlusLinear.rotate_right,
             label: 'Rotate',
             onTap: () {
               // Rotate opens the cropper with rotation
@@ -235,7 +236,7 @@ class _ImageDetailScreenState extends ConsumerState<ImageDetailScreen>
             },
           ),
           _ActionButton(
-            icon: Icons.delete_outline_rounded,
+            icon: IconsaxPlusLinear.trash,
             label: 'Delete',
             color: AppColors.error,
             onTap: () => _confirmDelete(context, image),
