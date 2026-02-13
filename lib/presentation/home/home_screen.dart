@@ -10,6 +10,7 @@ import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import 'package:images_to_pdf/core/theme/app_colors.dart';
 import 'package:images_to_pdf/data/services/image_picker_service.dart';
 import 'package:images_to_pdf/providers/image_provider.dart';
+import 'package:images_to_pdf/presentation/camera/camera_screen.dart';
 import 'package:images_to_pdf/presentation/editor/image_detail_screen.dart';
 import 'package:images_to_pdf/presentation/pdf_preview/pdf_preview_screen.dart';
 
@@ -440,11 +441,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Future<void> _captureFromCamera() async {
-    final path = await ref
-        .read(imagePickerServiceProvider)
-        .pickImageFromCamera();
-    if (path != null) {
-      ref.read(imageListProvider.notifier).addImages([path]);
+    final List<String>? capturedPaths = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CameraScreen()),
+    );
+
+    if (capturedPaths != null && capturedPaths.isNotEmpty) {
+      if (!mounted) return;
+      ref.read(imageListProvider.notifier).addImages(capturedPaths);
     }
   }
 
