@@ -61,7 +61,12 @@ class PdfEditorService {
   ) {
     if (draw.points.length < 2) return;
 
-    final pen = PdfPen(_toPdfColor(draw.color), width: draw.strokeWidth);
+    final pen = PdfPen(
+      _toPdfColor(draw.color),
+      width: draw.strokeWidth * pageSize.width,
+    );
+    pen.lineCap = PdfLineCap.round;
+    pen.lineJoin = PdfLineJoin.round;
 
     // Points are stored in normalized coordinates (0..1).
     for (int i = 0; i < draw.points.length - 1; i++) {
@@ -78,7 +83,10 @@ class PdfEditorService {
   }
 
   void _drawText(PdfGraphics graphics, TextAnnotation text, Size pageSize) {
-    final font = PdfStandardFont(PdfFontFamily.helvetica, text.fontSize);
+    final font = PdfStandardFont(
+      PdfFontFamily.helvetica,
+      text.fontSize * pageSize.width,
+    );
     final brush = PdfSolidBrush(_toPdfColor(text.color));
     graphics.drawString(
       text.text,

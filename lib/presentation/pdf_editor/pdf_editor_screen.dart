@@ -96,7 +96,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
                           ? _activeStrokePoints
                           : [],
                       activeStrokeColor: _currentColor,
-                      activeStrokeWidth: _strokeWidth,
+                      activeStrokeWidth: _strokeWidth / pageRect.size.width,
                       activeHighlightRect: pageIndex == _currentPage
                           ? _activeHighlightRect
                           : null,
@@ -112,7 +112,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
                             _onPanStart(d, pageIndex, pageRect.size),
                         onPanUpdate: (d) =>
                             _onPanUpdate(d, pageIndex, pageRect.size),
-                        onPanEnd: (d) => _onPanEnd(pageIndex),
+                        onPanEnd: (d) => _onPanEnd(pageIndex, pageRect.size),
                         onTapUp: (d) => _onTapUp(d, pageIndex, pageRect.size),
                       ),
                     ),
@@ -389,7 +389,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
     }
   }
 
-  void _onPanEnd(int pageIndex) {
+  void _onPanEnd(int pageIndex, Size pageSize) {
     switch (_currentTool) {
       case AnnotationTool.draw:
         if (_activeStrokePoints.length > 1) {
@@ -401,7 +401,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
                   pageIndex: pageIndex,
                   color: _currentColor,
                   points: List.from(_activeStrokePoints),
-                  strokeWidth: _strokeWidth,
+                  strokeWidth: _strokeWidth / pageSize.width,
                 ),
               );
         }
@@ -433,7 +433,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
   void _onTapUp(TapUpDetails d, int pageIndex, Size pageSize) {
     if (_currentTool == AnnotationTool.text) {
       final normalized = _normalize(d.localPosition, pageSize);
-      _showTextInputDialog(pageIndex, normalized);
+      _showTextInputDialog(pageIndex, normalized, pageSize);
     }
   }
 
@@ -445,7 +445,11 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
   }
 
   // ──────────────────────── TEXT INPUT DIALOG ────────────────────────
-  void _showTextInputDialog(int pageIndex, Offset normalizedPos) {
+  void _showTextInputDialog(
+    int pageIndex,
+    Offset normalizedPos,
+    Size pageSize,
+  ) {
     final controller = TextEditingController();
     showDialog(
       context: context,
@@ -492,7 +496,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
                         color: _currentColor,
                         position: normalizedPos,
                         text: text,
-                        fontSize: _textSize,
+                        fontSize: _textSize / pageSize.width,
                       ),
                     );
               }
@@ -736,7 +740,7 @@ class _AnnotationPainter extends CustomPainter {
   ) {
     final paint = Paint()
       ..color = color
-      ..strokeWidth = strokeW
+      ..strokeWidth = strokeW * size.width
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
@@ -759,7 +763,7 @@ class _AnnotationPainter extends CustomPainter {
         text: text.text,
         style: TextStyle(
           color: text.color,
-          fontSize: text.fontSize,
+          fontSize: text.fontSize * size.width,
           fontWeight: FontWeight.w500,
         ),
       ),
