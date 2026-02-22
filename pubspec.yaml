@@ -51,6 +51,8 @@ dependencies:
   google_fonts: ^8.0.1
   iconsax_plus: ^1.0.0
   camerawesome: ^2.5.0
+  pdfrx: ^1.0.97
+  syncfusion_flutter_pdf: ^29.1.38
 
 dev_dependencies:
   flutter_test:

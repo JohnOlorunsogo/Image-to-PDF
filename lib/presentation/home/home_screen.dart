@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,7 @@ import 'package:images_to_pdf/data/services/image_picker_service.dart';
 import 'package:images_to_pdf/providers/image_provider.dart';
 import 'package:images_to_pdf/presentation/camera/camera_screen.dart';
 import 'package:images_to_pdf/presentation/editor/image_detail_screen.dart';
+import 'package:images_to_pdf/presentation/pdf_editor/pdf_editor_screen.dart';
 import 'package:images_to_pdf/presentation/pdf_preview/pdf_preview_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -412,6 +414,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       },
                       isDark: isDark,
                     ),
+                    const SizedBox(height: 8),
+                    _MiniFabOption(
+                      icon: IconsaxPlusLinear.document_text,
+                      label: 'Edit PDF',
+                      onTap: () {
+                        setState(() => _fabExpanded = false);
+                        _pickPdfToEdit();
+                      },
+                      isDark: isDark,
+                    ),
                     const SizedBox(height: 12),
                   ],
                 )
@@ -449,6 +461,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (capturedPaths != null && capturedPaths.isNotEmpty) {
       if (!mounted) return;
       ref.read(imageListProvider.notifier).addImages(capturedPaths);
+    }
+  }
+
+  Future<void> _pickPdfToEdit() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (result != null && result.files.single.path != null) {
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PdfEditorScreen(filePath: result.files.single.path!),
+        ),
+      );
     }
   }
 
