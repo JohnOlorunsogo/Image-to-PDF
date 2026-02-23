@@ -25,6 +25,7 @@ class PdfEditorService {
 
     for (final entry in annotationsByPage.entries) {
       final pageIndex = entry.key;
+
       final annotations = entry.value;
 
       if (pageIndex >= document.pages.count) continue;
