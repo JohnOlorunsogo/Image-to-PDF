@@ -15,6 +15,8 @@ import 'package:images_to_pdf/presentation/camera/camera_screen.dart';
 import 'package:images_to_pdf/presentation/editor/image_detail_screen.dart';
 import 'package:images_to_pdf/presentation/pdf_editor/pdf_editor_screen.dart';
 import 'package:images_to_pdf/presentation/pdf_preview/pdf_preview_screen.dart';
+import 'package:images_to_pdf/presentation/widgets/animated_scale_button.dart';
+import 'dart:math' as math;
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +28,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
+  late final AnimationController _floatController;
   late final Animation<double> _fadeAnim;
   late final Animation<Offset> _slideAnim;
   bool _fabExpanded = false;
@@ -37,6 +40,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat(reverse: true);
     _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
     _slideAnim = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
         .animate(
@@ -48,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void dispose() {
     _animController.dispose();
+    _floatController.dispose();
     super.dispose();
   }
 
@@ -59,14 +67,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: _buildAppBar(context, images.length, colorScheme, isDark),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        switchInCurve: Curves.easeOut,
-        switchOutCurve: Curves.easeIn,
-        child: images.isEmpty
-            ? _buildEmptyState(context, isDark)
-            : _buildImageGrid(context, images, isDark),
+      body: Stack(
+        children: [
+          // Background Mesh
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: isDark
+                    ? AppColors.darkMeshGradient
+                    : AppColors.coolMeshGradient,
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+              child: Container(
+                color:
+                    (isDark ? AppColors.scaffoldDark : AppColors.surfaceLight)
+                        .withValues(alpha: 0.85),
+              ),
+            ),
+          ),
+          // Main content
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              child: images.isEmpty
+                  ? _buildEmptyState(context, isDark)
+                  : _buildImageGrid(context, images, isDark),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: _buildFab(context, isDark),
     );
@@ -132,12 +168,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Animated icon container
-                TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.8, end: 1.0),
-                  duration: const Duration(seconds: 2),
-                  curve: Curves.easeInOut,
-                  builder: (context, value, child) {
-                    return Transform.scale(scale: value, child: child);
+                AnimatedBuilder(
+                  animation: _floatController,
+                  builder: (context, child) {
+                    final dy = math.sin(_floatController.value * math.pi) * 12;
+                    return Transform.translate(
+                      offset: Offset(0, dy),
+                      child: child,
+                    );
                   },
                   child: Container(
                     width: 120,
@@ -553,8 +591,9 @@ class _ImageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return AnimatedScaleButton(
       onTap: onTap,
+      scaleDownTo: 0.94,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -671,45 +710,38 @@ class _GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onPressed();
-        },
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+    return AnimatedScaleButton(
+      onTap: onPressed,
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 20 : 28,
+          vertical: compact ? 12 : 14,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: compact ? 18 : 20, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: compact ? 14 : 15,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: compact ? 20 : 28,
-            vertical: compact ? 12 : 14,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: compact ? 18 : 20, color: Colors.white),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: compact ? 14 : 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -731,8 +763,9 @@ class _MiniFabOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return AnimatedScaleButton(
       onTap: onTap,
+      scaleDownTo: 0.96,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // ─── Primary Palette ───
-  static const Color primaryLight = Color(0xFF6366F1); // Indigo 500
-  static const Color primary = Color(0xFF4F46E5); // Indigo 600
-  static const Color primaryDark = Color(0xFF4338CA); // Indigo 700
+  // More vibrant and energetic Indigo / Purple tones
+  static const Color primaryLight = Color(0xFF818CF8); // Indigo 400
+  static const Color primary = Color(0xFF6366F1); // Indigo 500
+  static const Color primaryDark = Color(0xFF4F46E5); // Indigo 600
 
   // ─── Accent / Teal ───
   static const Color accent = Color(0xFF06B6D4); // Cyan 500
@@ -35,13 +36,25 @@ class AppColors {
 
   // ─── Gradients ───
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryLight, accent],
+    colors: [primaryLight, primaryDark],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const LinearGradient accentGradient = LinearGradient(
-    colors: [accent, accentLight],
+    colors: [accentLight, accentDark],
+    begin: Alignment.bottomLeft,
+    end: Alignment.topRight,
+  );
+
+  static const LinearGradient coolMeshGradient = LinearGradient(
+    colors: [Color(0xFF818CF8), Color(0xFFC084FC), Color(0xFF38BDF8)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient darkMeshGradient = LinearGradient(
+    colors: [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF1E293B)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

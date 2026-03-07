@@ -11,15 +11,15 @@ class AppTheme {
     return GoogleFonts.interTextTheme(base).copyWith(
       headlineLarge: GoogleFonts.inter(
         fontSize: 28,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: primary,
-        letterSpacing: -0.5,
+        letterSpacing: -1.0,
       ),
       headlineMedium: GoogleFonts.inter(
         fontSize: 24,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w800,
         color: primary,
-        letterSpacing: -0.3,
+        letterSpacing: -0.5,
       ),
       titleLarge: GoogleFonts.inter(
         fontSize: 20,
@@ -93,7 +93,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: AppColors.subtleBorderLight, width: 1),
         ),
         color: AppColors.cardLight,
@@ -193,7 +193,7 @@ class AppTheme {
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.cardLight,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         showDragHandle: true,
       ),
@@ -244,7 +244,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           side: const BorderSide(color: AppColors.subtleBorderDark, width: 0.5),
         ),
         color: AppColors.surfaceDark,
@@ -346,7 +346,7 @@ class AppTheme {
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surfaceDark,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
         showDragHandle: true,
       ),

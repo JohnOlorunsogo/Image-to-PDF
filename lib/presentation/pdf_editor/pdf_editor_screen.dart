@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:images_to_pdf/core/theme/app_colors.dart';
 import 'package:images_to_pdf/data/models/pdf_annotation_model.dart';
 import 'package:images_to_pdf/providers/pdf_editor_provider.dart';
+import 'package:images_to_pdf/presentation/widgets/animated_scale_button.dart';
 
 class PdfEditorScreen extends ConsumerStatefulWidget {
   final String filePath;
@@ -264,7 +265,7 @@ class _PdfEditorScreenState extends ConsumerState<PdfEditorScreen>
               child: Row(
                 children: [
                   ..._colorOptions.map(
-                    (c) => GestureDetector(
+                    (c) => AnimatedScaleButton(
                       onTap: () => setState(() => _currentColor = c),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
@@ -821,7 +822,7 @@ class _ToolButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return AnimatedScaleButton(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
